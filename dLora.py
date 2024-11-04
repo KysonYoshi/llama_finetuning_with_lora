@@ -1,5 +1,5 @@
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "0,1" 
+#os.environ["CUDA_VISIBLE_DEVICES"] = "0,1" 
 import torch
 import copy
 from transformers import AutoModelForCausalLM, AutoTokenizer, Trainer, TrainingArguments, DataCollatorForSeq2Seq
@@ -7,7 +7,7 @@ from peft import get_peft_config, get_peft_model, LoraConfig, TaskType
 from datasets import load_dataset
 
 # 1. 加载预训练模型和分词器
-model_name = "Qwen/Qwen2.5-14B-Instruct"  # 请根据实际模型名称调整
+model_name = "Qwen/Qwen2.5-1.5B-Instruct"  # 请根据实际模型名称调整
 token = "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"
 tokenizer = AutoTokenizer.from_pretrained(model_name, use_auth_token=token)
 model = AutoModelForCausalLM.from_pretrained(model_name, use_auth_token=token)
@@ -26,8 +26,8 @@ for param in original_model.parameters():
 
 # 3. 配置 LoRA
 lora_config = LoraConfig(
-    r=8,  # 低秩矩阵的秩
-    lora_alpha=32,  # LoRA alpha 参数
+    r=4,  # 低秩矩阵的秩
+    lora_alpha=16,  # LoRA alpha 参数
     lora_dropout=0.1,  # dropout 比例
     target_modules=["q_proj", "k_proj", "v_proj", "out_proj"],  # 需要应用 LoRA 的模块
     task_type=TaskType.CAUSAL_LM
@@ -101,7 +101,7 @@ training_args = TrainingArguments(
     output_dir="./qwen_lora_finetuned_cnndm",
     per_device_train_batch_size=1,  # 根据显存调整
     per_device_eval_batch_size=1,
-    gradient_accumulation_steps=8,  # 增加梯度累积以模拟更大的批次
+    gradient_accumulation_steps=4,  # 增加梯度累积以模拟更大的批次
     evaluation_strategy="epoch",
     learning_rate=5e-5,
     weight_decay=0.01,
@@ -111,7 +111,7 @@ training_args = TrainingArguments(
     fp16=True,  # 如果使用 GPU 支持半精度训练
     save_total_limit=2,  # 最多保留2个检查点
     #predict_with_generate=True,  # 生成摘要进行评估
-    ddp_find_unused_parameters=False,
+    #ddp_find_unused_parameters=False,
 )
 
 # 8. 定义 Trainer
