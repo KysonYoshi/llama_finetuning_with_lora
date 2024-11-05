@@ -7,7 +7,7 @@ from peft import get_peft_config, get_peft_model, LoraConfig, TaskType
 from datasets import load_dataset
 
 # 1. 加载预训练模型和分词器
-model_name = "Qwen/Qwen2.5-7B-Instruct"  # 请根据实际模型名称调整
+model_name = "Qwen/Qwen2.5-3B-Instruct"  # 请根据实际模型名称调整
 token = "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"
 tokenizer = AutoTokenizer.from_pretrained(model_name, use_auth_token=token)
 model = AutoModelForCausalLM.from_pretrained(model_name, use_auth_token=token)
